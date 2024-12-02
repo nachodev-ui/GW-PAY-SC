@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finalización de Transacción</title>
+</head>
+<body>
+  <h1 id="message">Procesando la transacción...</h1>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const token_ws = params.get('token_ws');
+
+    if (token_ws) {
+      fetch(`https://gw-back.onrender.com/api/transbank/get/?token_ws=${token_ws}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'AUTHORIZED') {
+            document.getElementById('message').innerText = 'Transacción exitosa. Redirigiendo...';
+            window.location.href = `exp://192.168.1.16:8081/--/finished?token_ws=${token_ws}`;
+          } else {
+            document.getElementById('message').innerText = 'Transacción fallida. Inténtalo de nuevo.';
+          }
+        })
+        .catch(() => {
+          document.getElementById('message').innerText = 'Error al validar la transacción.';
+        });
+    } else {
+      document.getElementById('message').innerText = 'Token no encontrado.';
+    }
+  </script>
+</body>
+</html>
