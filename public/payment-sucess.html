@@ -19,7 +19,7 @@
             document.getElementById('message').innerText = 'Transacción exitosa. Redirigiendo...';
             window.location.href = `exp://192.168.1.16:8081/--/finished?token_ws=${token_ws}`;
           } else {
-            document.getElementById('message').innerText = 'Transacción fallida. Inténtalo de nuevo.';
+            document.getElementById('message').innerText = 'Transacción fallida. Inténtalo de nuevo.', {data, status};
           }
         })
         .catch(() => {
