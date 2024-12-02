@@ -12,7 +12,7 @@
     const token_ws = params.get('token_ws');
 
     if (token_ws) {
-      fetch(`https://gw-back.onrender.com/api/transbank/get/?token_ws=${token_ws}`)
+      fetch(`https://gw-back.onrender.com/api/transbank/get/${token_ws}`)
         .then(response => response.json())
         .then(data => {
           if (data.status === 'AUTHORIZED') {
