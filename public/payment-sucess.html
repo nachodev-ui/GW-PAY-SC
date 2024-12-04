@@ -12,26 +12,33 @@
     const token_ws = params.get('token_ws');
 
     if (token_ws) {
-  fetch(`https://gw-back.onrender.com/api/transbank/confirm/${token_ws}`)
-    .then(response => {
-      console.log("Respuesta del backend:", response);
-      return response.json();
-    })
-    .then(data => {
-      console.log("Datos procesados:", data);
-      if (data.status === 'AUTHORIZED') {
-        document.getElementById('message').innerText = 'Transacción exitosa. Redirigiendo...';
-      } else {
-        document.getElementById('message').innerText = `Transacción fallida. Status: ${data.status}`;
-      }
-    })
-    .catch(error => {
-      console.error('Error al validar la transacción:', error);
-      document.getElementById('message').innerText = 'Error al validar la transacción.';
-    });
-} else {
-  document.getElementById('message').innerText = 'Token no encontrado.';
-}
+      fetch(`https://gw-back.onrender.com/api/transbank/confirm/${token_ws}`, {
+        method: 'PUT', // Cambiar el método a PUT
+        headers: {
+          'Content-Type': 'application/json', // Asegurarse de que el tipo de contenido es correcto
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error en la solicitud al backend');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Datos procesados:", data);
+        if (data.status === 'AUTHORIZED') {
+          document.getElementById('message').innerText = 'Transacción exitosa. Redirigiendo...';
+        } else {
+          document.getElementById('message').innerText = `Transacción fallida. Status: ${data.status}`;
+        }
+      })
+      .catch(error => {
+        console.error('Error al validar la transacción:', error);
+        document.getElementById('message').innerText = 'Error al validar la transacción.';
+      });
+    } else {
+      document.getElementById('message').innerText = 'Token no encontrado.';
+    }
   </script>
 </body>
 </html>
