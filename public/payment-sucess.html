@@ -11,10 +11,8 @@
     const params = new URLSearchParams(window.location.search);
     const token_ws = params.get('token_ws');
 
-    console.log('token_ws', token_ws);  
-
     if (token_ws) {
-  fetch(`https://gw-back.onrender.com/api/transbank/get/${token_ws}`)
+  fetch(`https://gw-back.onrender.com/api/transbank/confirm/${token_ws}`)
     .then(response => {
       console.log("Respuesta del backend:", response);
       return response.json();
@@ -23,7 +21,6 @@
       console.log("Datos procesados:", data);
       if (data.status === 'AUTHORIZED') {
         document.getElementById('message').innerText = 'Transacción exitosa. Redirigiendo...';
-        window.location.href = `exp://192.168.1.16:8081/--/finished?token_ws=${token_ws}`;
       } else {
         document.getElementById('message').innerText = `Transacción fallida. Status: ${data.status}`;
       }
