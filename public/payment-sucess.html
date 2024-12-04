@@ -13,38 +13,65 @@
       padding: 20px;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
+    .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #ddd;
+      border-top: 5px solid #4d74c6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .status-container {
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
+      margin-top: 50px;
     }
 
     .status-image {
       width: 150px;
-      height: 150px;
+      height: auto;
       margin-bottom: 20px;
     }
 
-    .success {
-      color: #4caf50;
+    .status-message {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
     }
 
-    .error {
-      color: #f44336;
+    .close-message {
+      font-size: 1rem;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <div class="status-container">
-    <h1 id="message">Procesando la transacción...</h1>
-    <img id="status-image" class="status-image" src="" alt="" style="display: none;" />
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
   </div>
-
+  <div class="status-container" id="status-container">
+    <img id="status-image" class="status-image" alt="Estado de la transacción" />
+    <p id="status-message" class="status-message"></p>
+    <p class="close-message">Ya puedes cerrar esta página para volver a la aplicación</p>
+  </div>
   <script>
     const params = new URLSearchParams(window.location.search);
     const token_ws = params.get('token_ws');
@@ -56,37 +83,43 @@
           'Content-Type': 'application/json',
         },
       })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error en la solicitud al backend');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log("Datos procesados:", data);
-        const messageElement = document.getElementById('message');
-        const imageElement = document.getElementById('status-image');
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error en la solicitud al backend');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const loader = document.getElementById('loader');
+          const statusContainer = document.getElementById('status-container');
+          const statusImage = document.getElementById('status-image');
+          const statusMessage = document.getElementById('status-message');
 
-        if (data.status === 'AUTHORIZED') {
-          messageElement.innerText = '¡Transacción exitosa!';
-          messageElement.classList.add('success');
-          imageElement.src = 'https://www.kablooe.com/wp-content/uploads/2019/08/check_mark.png'; // Cambia a la URL de tu imagen de éxito
-          imageElement.alt = 'Transacción exitosa';
-          imageElement.style.display = 'block';
-        } else {
-          messageElement.innerText = `Transacción fallida. Status: ${data.status}`;
-          messageElement.classList.add('error');
-          imageElement.src = 'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png';
-          imageElement.alt = 'Transacción fallida';
-          imageElement.style.display = 'block';
-        }
-      })
-      .catch(error => {
-        console.error('Error al validar la transacción:', error);
-        document.getElementById('message').innerText = 'Error al validar la transacción.';
-      });
+          loader.style.display = 'none';
+          statusContainer.style.display = 'flex';
+
+          if (data.status === 'AUTHORIZED') {
+            statusImage.src = 'https://www.kablooe.com/wp-content/uploads/2019/08/check_mark.png'; 
+            statusMessage.innerText = '¡Transacción exitosa!';
+          } else {
+            statusImage.src = 'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png'; 
+            statusMessage.innerText = `Transacción fallida. Estado: ${data.status}`;
+          }
+        })
+        .catch(error => {
+          console.error('Error al validar la transacción:', error);
+          const loader = document.getElementById('loader');
+          const statusContainer = document.getElementById('status-container');
+          const statusImage = document.getElementById('status-image');
+          const statusMessage = document.getElementById('status-message');
+
+          loader.style.display = 'none';
+          statusContainer.style.display = 'flex';
+          statusImage.src = 'https://cdn.pixabay.com/photo/2017/02/12/21/29/false-2061131_1280.png'; 
+          statusMessage.innerText = 'Error al validar la transacción.';
+        });
     } else {
-      document.getElementById('message').innerText = 'Token no encontrado.';
+      document.getElementById('loader').innerHTML = 'Token no encontrado.';
     }
   </script>
 </body>
